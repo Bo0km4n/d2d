@@ -7,7 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var mysql *gorm.DB
+var DB *gorm.DB
 
 var (
 	HOST         string
@@ -19,11 +19,7 @@ var (
 )
 
 // InitMySQL //
-func InitMySQL(host, port, user, password, database string) *gorm.DB {
-	if mysql != nil {
-		return mysql
-	}
-
+func InitMySQL(host, port, user, password, database string) {
 	HOST = host
 	PORT = port
 	USER = user
@@ -43,6 +39,5 @@ func InitMySQL(host, port, user, password, database string) *gorm.DB {
 	// NOTE デフォルトでは関連テーブルの保存を許可しない
 	gormDB = gormDB.Set("gorm:save_associations", false)
 
-	mysql = gormDB
-	return mysql
+	DB = gormDB
 }
