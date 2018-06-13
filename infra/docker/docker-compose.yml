@@ -6,7 +6,7 @@ services:
         ports:
             - "4222:4222"
             - "8222:8222"
-    mongo:
+    db:
         image: mysql:5.7.6
         container_name: mysql
         ports:
