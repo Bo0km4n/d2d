@@ -11,7 +11,7 @@ import (
 var queueGroup string
 
 func init() {
-	db.InitMySQL()
+	db.InitMySQL("localhost", "3306", "root", "password", "d2d")
 	pubsub.InitNATS("localhost", "4222", "d2d")
 	queueGroup = "queue_1"
 }
