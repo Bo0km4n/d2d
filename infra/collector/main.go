@@ -2,8 +2,8 @@ package main
 
 import (
 	logHandler "github.com/Bo0km4n/d2d/infra/collector/log/handler/http"
-	"github.com/Bo0km4n/d2d/infra/collector/log/repository"
-	"github.com/Bo0km4n/d2d/infra/collector/log/usecase"
+	logRepo "github.com/Bo0km4n/d2d/infra/collector/log/repository"
+	logUC "github.com/Bo0km4n/d2d/infra/collector/log/usecase"
 	"github.com/Bo0km4n/d2d/infra/nats"
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +17,7 @@ func listenAPI() {
 	api.Run(":" + "8765")
 }
 
+// NewRouter //
 func NewRouter() *gin.Engine {
 	api := gin.New()
 	api.HandleMethodNotAllowed = true
@@ -25,8 +26,8 @@ func NewRouter() *gin.Engine {
 	nats.New("localhost", "4222", "d2d")
 
 	{
-		logRepo := repository.NewLogRepository(nats.NATSConn)
-		logUC := usecase.NewLogUsecase(logRepo)
+		logRepo := logRepo.NewLogRepository(nats.NATSConn)
+		logUC := logUC.NewLogUsecase(logRepo)
 		logHandler.NewHTTPLogHandler(api, logUC)
 	}
 
