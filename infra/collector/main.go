@@ -8,6 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func init() {
+	nats.New("localhost", "4222", "d2d")
+}
+
 func main() {
 	listenAPI()
 }
@@ -23,7 +27,6 @@ func NewRouter() *gin.Engine {
 	api.HandleMethodNotAllowed = true
 	api.Use(gin.Logger())
 	api.Use(gin.Recovery())
-	nats.New("localhost", "4222", "d2d")
 
 	{
 		logRepo := logRepo.NewLogRepository(nats.NATSConn)
