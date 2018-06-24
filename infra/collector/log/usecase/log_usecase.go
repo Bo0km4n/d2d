@@ -4,11 +4,12 @@ import (
 	"context"
 
 	logRepo "github.com/Bo0km4n/d2d/infra/collector/log/repository"
+	"github.com/Bo0km4n/d2d/infra/collector/model"
 )
 
 // LogUC //
 type LogUC interface {
-	Store(ctx context.Context, item interface{}) error
+	Store(ctx context.Context, item *model.Log) error
 }
 
 type logUC struct {
@@ -22,6 +23,6 @@ func NewLogUsecase(repo logRepo.LogRepository) LogUC {
 	}
 }
 
-func (luc *logUC) Store(ctx context.Context, item interface{}) error {
-	return luc.logRepo.StoreToNATS(ctx, item)
+func (luc *logUC) Store(ctx context.Context, item *model.Log) error {
+	return luc.logRepo.StoreDB(ctx, item)
 }

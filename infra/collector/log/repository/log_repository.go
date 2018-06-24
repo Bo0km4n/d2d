@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/Bo0km4n/d2d/infra/collector/model"
 	"github.com/Bo0km4n/d2d/infra/nats"
 )
 
 // LogRepository interface
 type LogRepository interface {
-	StoreToNATS(ctx context.Context, item interface{}) error
+	StoreDB(ctx context.Context, item *model.Log) error
 }
 
 type logRepository struct {
@@ -24,7 +25,7 @@ func NewLogRepository(conn *nats.NATS) LogRepository {
 	return &logRepo
 }
 
-func (lr *logRepository) StoreToNATS(ctx context.Context, item interface{}) error {
+func (lr *logRepository) StoreDB(ctx context.Context, item *model.Log) error {
 	body, err := json.Marshal(&item)
 	if err != nil {
 		return err
