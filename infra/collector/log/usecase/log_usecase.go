@@ -9,7 +9,7 @@ import (
 
 // LogUC //
 type LogUC interface {
-	Store(ctx context.Context, item *model.Log) error
+	Store(ctx context.Context, item []*model.Log) error
 }
 
 type logUC struct {
@@ -23,6 +23,6 @@ func NewLogUsecase(repo logRepo.LogRepository) LogUC {
 	}
 }
 
-func (luc *logUC) Store(ctx context.Context, item *model.Log) error {
+func (luc *logUC) Store(ctx context.Context, item []*model.Log) error {
 	return luc.logRepo.StoreDB(ctx, item)
 }

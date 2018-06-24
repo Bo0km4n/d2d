@@ -20,7 +20,7 @@ type HTTPLogHandler struct {
 
 // Store //
 func (h *HTTPLogHandler) Store(c *gin.Context) {
-	var param logEntity.LogParam
+	var param []*logEntity.LogParam
 
 	if err := c.BindJSON(&param); err != nil {
 		log.Printf("Bind json error: %v", err)
@@ -30,7 +30,7 @@ func (h *HTTPLogHandler) Store(c *gin.Context) {
 
 	ctx := context.Background()
 	pp.Println(param)
-	item := convertParamToLog(&param)
+	item := convertParamToLogs(param)
 
 	if err := h.logUC.Store(ctx, item); err != nil {
 		c.JSON(http.StatusBadRequest, err)
@@ -49,17 +49,23 @@ func NewHTTPLogHandler(g *gin.Engine, uc logUC.LogUC) {
 	v1.GET("/log", h.Store)
 }
 
-func convertParamToLog(param *logEntity.LogParam) *model.Log {
-	return &model.Log{
-		AccelX: param.Sensor.Accel.X,
-		AccelY: param.Sensor.Accel.Y,
-		AccelZ: param.Sensor.Accel.Z,
-		GyroX:  param.Sensor.Gyro.X,
-		GyroY:  param.Sensor.Gyro.Y,
-		GyroZ:  param.Sensor.Gyro.Z,
-		MagX:   param.Sensor.Mag.X,
-		MagY:   param.Sensor.Mag.Y,
-		MagZ:   param.Sensor.Mag.Z,
-		Time:   param.Time,
+func convertParamToLogs(param []*logEntity.LogParam) []*model.Log {
+	logs := make([]*model.Log, 0)
+
+	for i := range param {
+		v := &model.Log{
+			AccelX: param[i].Sensor.Accel.X,
+			AccelY: param[i].Sensor.Accel.Y,
+			AccelZ: param[i].Sensor.Accel.Z,
+			GyroX:  param[i].Sensor.Gyro.X,
+			GyroY:  param[i].Sensor.Gyro.Y,
+			GyroZ:  param[i].Sensor.Gyro.Z,
+			MagX:   param[i].Sensor.Mag.X,
+			MagY:   param[i].Sensor.Mag.Y,
+			MagZ:   param[i].Sensor.Mag.Z,
+			Time:   param[i].Time,
+		}
+		logs = append(logs, v)
 	}
+	return logs
 }

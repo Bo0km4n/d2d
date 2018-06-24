@@ -10,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var mysql *gorm.DB
+var DB *gorm.DB
 
 var (
 	HOST         string
@@ -22,8 +22,8 @@ var (
 )
 
 func MySQL() *gorm.DB {
-	if mysql != nil {
-		return mysql
+	if DB != nil {
+		return DB
 	}
 
 	HOST = viper.GetString("mysql.host")
@@ -45,6 +45,6 @@ func MySQL() *gorm.DB {
 	// NOTE デフォルトでは関連テーブルの保存を許可しない
 	gormDB = gormDB.Set("gorm:save_associations", false)
 
-	mysql = gormDB
-	return mysql
+	DB = gormDB
+	return DB
 }
