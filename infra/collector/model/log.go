@@ -21,13 +21,13 @@ type Log struct {
 type AggregatedLog struct {
 	ID           int `gorm:"primary_key"`
 	ElapsedTime  uint64
-	LambdaAccelX int
-	LambdaAccelY int
-	LambdaAccelZ int
-	LambdaGyroX  int
-	LambdaGyroY  int
-	LambdaGyroZ  int
-	LambdaMagX   int
-	LambdaMagY   int
-	LambdaMagZ   int
+	LambdaAccelX float64
+	LambdaAccelY float64
+	LambdaAccelZ float64
+	LambdaGyroX  float64
+	LambdaGyroY  float64
+	LambdaGyroZ  float64
+	LambdaMagX   float64
+	LambdaMagY   float64
+	LambdaMagZ   float64
 }
