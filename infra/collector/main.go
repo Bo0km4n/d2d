@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	aggRepo "github.com/Bo0km4n/d2d/infra/collector/aggregatedlog/repository"
 	"github.com/Bo0km4n/d2d/infra/collector/db"
 	logHandler "github.com/Bo0km4n/d2d/infra/collector/log/handler/http"
 	logRepo "github.com/Bo0km4n/d2d/infra/collector/log/repository"
@@ -46,7 +47,8 @@ func NewRouter() *gin.Engine {
 
 	{
 		logRepo := logRepo.NewLogRepository(nats.NATSConn, db.DB)
-		logUC := logUC.NewLogUsecase(logRepo)
+		aggRepo := aggRepo.NewAggregatedLogRepository(db.DB)
+		logUC := logUC.NewLogUsecase(logRepo, aggRepo)
 		logHandler.NewHTTPLogHandler(api, logUC)
 	}
 

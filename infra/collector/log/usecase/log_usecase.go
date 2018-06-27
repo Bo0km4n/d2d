@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 
+	aggregatedLogRepo "github.com/Bo0km4n/d2d/infra/collector/aggregatedlog/repository"
 	logRepo "github.com/Bo0km4n/d2d/infra/collector/log/repository"
 	"github.com/Bo0km4n/d2d/infra/collector/model"
 )
@@ -14,17 +15,20 @@ type LogUC interface {
 }
 
 type logUC struct {
-	logRepo logRepo.LogRepository
+	logRepo           logRepo.LogRepository
+	aggregatedLogRepo aggregatedLogRepo.AggregatedLogRepository
 }
 
 // NewLogUsecase //
-func NewLogUsecase(repo logRepo.LogRepository) LogUC {
+func NewLogUsecase(repo logRepo.LogRepository, aggrepo aggregatedLogRepo.AggregatedLogRepository) LogUC {
 	return &logUC{
-		logRepo: repo,
+		logRepo:           repo,
+		aggregatedLogRepo: aggrepo,
 	}
 }
 
 func (luc *logUC) Store(ctx context.Context, item []*model.Log) error {
+	// return luc.aggregatedLogRepo.Store(ctx, compressLog(item))
 	return luc.logRepo.StoreDB(ctx, item)
 }
 
@@ -158,6 +162,4 @@ func compressLog(logs []*model.Log) *model.AggregatedLog {
 		LambdaMagY:   lambdaMagY,
 		LambdaMagZ:   lambdaMagZ,
 	}
-
-	return nil
 }
