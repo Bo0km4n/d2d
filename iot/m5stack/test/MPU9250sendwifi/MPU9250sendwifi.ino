@@ -28,6 +28,7 @@
 #define WIFI_SSID "yanaka"
 #define WIFI_PASS "honma123"
 
+#define buttonA_GPIO 39
 MPU9250 IMU;
 // Kalman kalmanX, kalmanY, kalmanZ; // Create the Kalman instances
 HTTPClient http;
@@ -35,13 +36,20 @@ WiFiMulti wifi;
 
 
 StaticJsonBuffer<5000> jsonBuffer;
+JsonArray& root= jsonBuffer.createArray();
+
+bool operatingState = false;//検知の動作状態
+bool sendState = false;//送信状態
+bool detectState = false;//検知しているかの状態
+float lastMz =0;
+float variation = 50;//変化量
 
 void setup()
 {
   M5.begin();
   Wire.begin();
 
-
+ pinMode(buttonA_GPIO, INPUT); //GPIO #39 は内部プルアップ無し
     
 
 #ifdef LCD
@@ -422,9 +430,106 @@ void loop()
       M5.Lcd.setCursor(12, 144); 
       M5.Lcd.print("rt: ");
       M5.Lcd.print((float) IMU.sumCount / IMU.sum, 2);
-      M5.Lcd.print(" Hz");
+      M5.Lcd.println(" Hz");
 #endif // LCD
 
+  //ボタンで動作
+ if(digitalRead(buttonA_GPIO) == 0){
+      operatingState = !operatingState;
+       detectState = false;
+  }
+        if(operatingState == true){
+              M5.Lcd.println("System ON ");
+
+      }else  if(operatingState == false){
+              M5.Lcd.println("System OFF ");
+      }
+   
+  if(operatingState == true && detectState == false){
+    Serial.println(lastMz+variation);
+    
+    if(lastMz+variation <IMU.mz ||IMU.mz <lastMz-variation)
+        {
+          detectState = true;
+          sendState =false;
+
+        }
+
+   }
+   if(operatingState == true && detectState == true){
+        if(lastMz+variation >IMU.mz && IMU.mz >lastMz-variation){
+          detectState = false;
+          sendState =true;
+
+      }
+    }   
+   if(operatingState == true &&detectState ==true){//データの蓄積部
+                Serial.println("store");
+
+
+    JsonObject& loopData = jsonBuffer.createObject();
+  JsonObject& sensor = loopData.createNestedObject("sensor");
+  JsonObject&  accel= sensor.createNestedObject("accel");
+  JsonObject& gyro= sensor.createNestedObject("gyro");
+  JsonObject& mag= sensor.createNestedObject("mag");
+
+  accel["b"] = "aaa";
+  accel["x"]= 1000*IMU.ax;
+  accel["y"]= 1000*IMU.ay;
+  accel["z"]= 1000*IMU.az;
+
+  gyro["x"] =IMU.gx;
+  gyro["y"] =IMU.gy;
+  gyro["z"] =IMU.gz;
+
+  mag["x"] = IMU.mx;
+  mag["y"] = IMU.my;
+  mag["z"] = IMU.mz;
+
+  root.add(loopData); 
+  
+   }
+    if(operatingState == true &&sendState ==true){
+                Serial.println("send");
+                sendState =false;
+        
+      char sensorData[5000];
+    
+      root.printTo(sensorData,sizeof(sensorData));//josnからstringへの変換
+      Serial.println("debug");
+      Serial.println(sensorData);
+      
+    
+          // wifi
+      wifi.addAP(WIFI_SSID, WIFI_PASS);
+       
+      while (wifi.run() != WL_CONNECTED) {
+        delay(100);
+        //M5.Lcd.printf(".");
+      }
+      M5.Lcd.println("wifi connect ok");
+     
+      // post slack
+      http.begin( "http://192.168.43.172:3000/" );
+      http.addHeader("Content-Type", "application/json" );
+      
+      int a = http.POST((uint8_t*)sensorData, strlen(sensorData));
+      M5.Lcd.println("post");
+        M5.Lcd.println(a);
+        jsonBuffer.clear();
+               
+        JsonArray& root= jsonBuffer.createArray();
+
+    }
+   
+
+  
+
+  delay(10);
+   lastMz = IMU.mz;
+      
+
+      
       IMU.count = millis();
       IMU.sumCount = 0;
       IMU.sum = 0;
@@ -441,49 +546,7 @@ void loop()
     } // if (IMU.delt_t > 500)
   } // if (AHRS)
 
-StaticJsonBuffer<500> jsonBuffer;
 
-    JsonObject& root = jsonBuffer.createObject();
-  JsonObject& sensor = root.createNestedObject("sensor");
-  JsonObject&  accel= sensor.createNestedObject("accel");
-  JsonObject& gyro= sensor.createNestedObject("gyro");
-  JsonObject& mag= sensor.createNestedObject("mag");
-
-  accel["b"] = "aaa";
-  accel["x"]= 1000*IMU.ax;
-  accel["y"]= 1000*IMU.ay;
-  accel["z"]= 1000*IMU.az;
-
-  gyro["x"] =IMU.gx;
-  gyro["y"] =IMU.gy;
-  gyro["z"] =IMU.gz;
-
-  mag["x"] = IMU.mx;
-  mag["y"] = IMU.my;
-  mag["z"] = IMU.mx;
-
-  char sensorData[300];
-
-  root.printTo(sensorData,sizeof(sensorData));//josnからstringへの変換
-  Serial.println("debug");
-  Serial.println(sensorData);
-  Serial.println( 1000*IMU.ax);
   
-
-      // wifi
-  wifi.addAP(WIFI_SSID, WIFI_PASS);
    
-  while (wifi.run() != WL_CONNECTED) {
-    delay(100);
-    //M5.Lcd.printf(".");
-  }
-  M5.Lcd.println("wifi connect ok");
- 
-  // post slack
-  http.begin( "http://192.168.43.172:3000/" );
-  http.addHeader("Content-Type", "application/json" );
-  
-  int a = http.POST((uint8_t*)sensorData, strlen(sensorData));
-  M5.Lcd.println("post");
-    M5.Lcd.println(a);
 }
