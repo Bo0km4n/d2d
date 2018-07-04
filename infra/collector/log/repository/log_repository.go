@@ -11,6 +11,7 @@ import (
 // LogRepository interface
 type LogRepository interface {
 	StoreDB(ctx context.Context, item []*model.Log) error
+	Store(ctx context.Context, item *model.AggregatedLog) error
 }
 
 type logRepository struct {
@@ -34,4 +35,8 @@ func (lr *logRepository) StoreDB(ctx context.Context, item []*model.Log) error {
 		}
 	}
 	return nil
+}
+
+func (lr *logRepository) Store(ctx context.Context, item *model.AggregatedLog) error {
+	return lr.DB.Create(item).Error
 }

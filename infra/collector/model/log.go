@@ -4,6 +4,7 @@ import "time"
 
 type Log struct {
 	ID        int `gorm:"primary_key"`
+	UUID      string
 	Time      uint64
 	AccelX    int
 	AccelY    int
@@ -19,15 +20,17 @@ type Log struct {
 }
 
 type AggregatedLog struct {
-	ID           int `gorm:"primary_key"`
-	ElapsedTime  uint64
-	LambdaAccelX float64
-	LambdaAccelY float64
-	LambdaAccelZ float64
-	LambdaGyroX  float64
-	LambdaGyroY  float64
-	LambdaGyroZ  float64
-	LambdaMagX   float64
-	LambdaMagY   float64
-	LambdaMagZ   float64
+	ID          int `gorm:"primary_key"`
+	Label       string
+	UUID        string
+	ElapsedTime uint64
+	DeltaAccelX float64
+	DeltaAccelY float64
+	DeltaAccelZ float64
+	DeltaGyroX  float64
+	DeltaGyroY  float64
+	DeltaGyroZ  float64
+	DeltaMagX   float64
+	DeltaMagY   float64
+	DeltaMagZ   float64
 }

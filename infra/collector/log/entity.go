@@ -2,6 +2,7 @@ package log
 
 type LogParam struct {
 	Time   uint64  `json:"time"`
+	UUID   string  `json:"uuid"`
 	Sensor *Sensor `json:"sensor"`
 }
 

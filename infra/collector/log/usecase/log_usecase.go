@@ -28,8 +28,8 @@ func NewLogUsecase(repo logRepo.LogRepository, aggrepo aggregatedLogRepo.Aggrega
 }
 
 func (luc *logUC) Store(ctx context.Context, item []*model.Log) error {
-	// return luc.aggregatedLogRepo.Store(ctx, compressLog(item))
-	return luc.logRepo.StoreDB(ctx, item)
+	return luc.aggregatedLogRepo.Store(ctx, compressLog(item))
+	// return luc.logRepo.StoreDB(ctx, item)
 }
 
 func compressLog(logs []*model.Log) *model.AggregatedLog {
@@ -60,17 +60,17 @@ func compressLog(logs []*model.Log) *model.AggregatedLog {
 	var minMagY int
 	var minMagZ int
 
-	var lambdaAccelX float64
-	var lambdaAccelY float64
-	var lambdaAccelZ float64
+	var deltaAccelX float64
+	var deltaAccelY float64
+	var deltaAccelZ float64
 
-	var lambdaGyroX float64
-	var lambdaGyroY float64
-	var lambdaGyroZ float64
+	var deltaGyroX float64
+	var deltaGyroY float64
+	var deltaGyroZ float64
 
-	var lambdaMagX float64
-	var lambdaMagY float64
-	var lambdaMagZ float64
+	var deltaMagX float64
+	var deltaMagY float64
+	var deltaMagZ float64
 
 	for _, l := range logs {
 		if maxTime < l.Time {
@@ -138,28 +138,29 @@ func compressLog(logs []*model.Log) *model.AggregatedLog {
 		}
 	}
 
-	lambdaAccelX = math.Abs(float64(maxAccelX - minAccelX))
-	lambdaAccelY = math.Abs(float64(maxAccelY - minAccelY))
-	lambdaAccelZ = math.Abs(float64(maxAccelZ - minAccelZ))
+	deltaAccelX = math.Abs(float64(maxAccelX - minAccelX))
+	deltaAccelY = math.Abs(float64(maxAccelY - minAccelY))
+	deltaAccelZ = math.Abs(float64(maxAccelZ - minAccelZ))
 
-	lambdaGyroX = math.Abs(float64(maxGyroX - minGyroX))
-	lambdaGyroY = math.Abs(float64(maxGyroY - minGyroY))
-	lambdaGyroZ = math.Abs(float64(maxGyroZ - minGyroZ))
+	deltaGyroX = math.Abs(float64(maxGyroX - minGyroX))
+	deltaGyroY = math.Abs(float64(maxGyroY - minGyroY))
+	deltaGyroZ = math.Abs(float64(maxGyroZ - minGyroZ))
 
-	lambdaMagX = math.Abs(float64(maxMagX - minMagX))
-	lambdaMagY = math.Abs(float64(maxMagY - minMagY))
-	lambdaMagZ = math.Abs(float64(maxMagZ - minMagZ))
+	deltaMagX = math.Abs(float64(maxMagX - minMagX))
+	deltaMagY = math.Abs(float64(maxMagY - minMagY))
+	deltaMagZ = math.Abs(float64(maxMagZ - minMagZ))
 
 	return &model.AggregatedLog{
-		ElapsedTime:  maxTime - minTime,
-		LambdaAccelX: lambdaAccelX,
-		LambdaAccelY: lambdaAccelY,
-		LambdaAccelZ: lambdaAccelZ,
-		LambdaGyroX:  lambdaGyroX,
-		LambdaGyroY:  lambdaGyroY,
-		LambdaGyroZ:  lambdaGyroZ,
-		LambdaMagX:   lambdaMagX,
-		LambdaMagY:   lambdaMagY,
-		LambdaMagZ:   lambdaMagZ,
+		UUID:        logs[0].UUID,
+		ElapsedTime: maxTime - minTime,
+		DeltaAccelX: deltaAccelX,
+		DeltaAccelY: deltaAccelY,
+		DeltaAccelZ: deltaAccelZ,
+		DeltaGyroX:  deltaGyroX,
+		DeltaGyroY:  deltaGyroY,
+		DeltaGyroZ:  deltaGyroZ,
+		DeltaMagX:   deltaMagX,
+		DeltaMagY:   deltaMagY,
+		DeltaMagZ:   deltaMagZ,
 	}
 }

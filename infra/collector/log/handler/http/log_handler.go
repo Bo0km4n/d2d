@@ -54,6 +54,7 @@ func convertParamToLogs(param []*logEntity.LogParam) []*model.Log {
 
 	for i := range param {
 		v := &model.Log{
+			UUID:   param[i].UUID,
 			AccelX: param[i].Sensor.Accel.X,
 			AccelY: param[i].Sensor.Accel.Y,
 			AccelZ: param[i].Sensor.Accel.Z,
