@@ -43,6 +43,8 @@ bool sendState = false;//送信状態
 bool detectState = false;//検知しているかの状態
 float lastMz =0;
 float variation = 50;//変化量
+int startTime =0;
+char mac_addres[20];
 
 void setup()
 {
@@ -50,7 +52,10 @@ void setup()
   Wire.begin();
 
  pinMode(buttonA_GPIO, INPUT); //GPIO #39 は内部プルアップ無し
-    
+ byte mac_addr_buf[6];
+
+  WiFi.macAddress(mac_addr_buf);
+  sprintf(mac_addres, "%02X:%02X:%02X:%02X:%02X:%02X", mac_addr_buf[0], mac_addr_buf[1], mac_addr_buf[2], mac_addr_buf[3], mac_addr_buf[4], mac_addr_buf[5]);
 
 #ifdef LCD
   // Start device display with ID of sensor
@@ -452,7 +457,7 @@ void loop()
         {
           detectState = true;
           sendState =false;
-
+          startTime = millis();
         }
 
    }
@@ -473,7 +478,7 @@ void loop()
   JsonObject& gyro= sensor.createNestedObject("gyro");
   JsonObject& mag= sensor.createNestedObject("mag");
 
-  accel["b"] = "aaa";
+  loopData["time"] = millis()-startTime;
   accel["x"]= 1000*IMU.ax;
   accel["y"]= 1000*IMU.ay;
   accel["z"]= 1000*IMU.az;
