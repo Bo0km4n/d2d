@@ -3,18 +3,18 @@ package model
 import "time"
 
 type Log struct {
-	ID        int    `gorm:"primary_key"`
-	UUID      string `json:"macAddress"`
+	ID        float64 `gorm:"primary_key"`
+	UUID      string  `json:"macAddress"`
 	Time      uint64
-	AccelX    int
-	AccelY    int
-	AccelZ    int
-	GyroX     int
-	GyroY     int
-	GyroZ     int
-	MagX      int
-	MagY      int
-	MagZ      int
+	AccelX    float64
+	AccelY    float64
+	AccelZ    float64
+	GyroX     float64
+	GyroY     float64
+	GyroZ     float64
+	MagX      float64
+	MagY      float64
+	MagZ      float64
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -36,29 +36,29 @@ func compressLog(logs []*model.Log) *model.AggregatedLog {
 	var maxTime uint64
 	var minTime uint64
 
-	var maxAccelX int
-	var maxAccelY int
-	var maxAccelZ int
+	var maxAccelX float64
+	var maxAccelY float64
+	var maxAccelZ float64
 
-	var minAccelX int
-	var minAccelY int
-	var minAccelZ int
+	var minAccelX float64
+	var minAccelY float64
+	var minAccelZ float64
 
-	var maxGyroX int
-	var maxGyroY int
-	var maxGyroZ int
+	var maxGyroX float64
+	var maxGyroY float64
+	var maxGyroZ float64
 
-	var minGyroX int
-	var minGyroY int
-	var minGyroZ int
+	var minGyroX float64
+	var minGyroY float64
+	var minGyroZ float64
 
-	var maxMagX int
-	var maxMagY int
-	var maxMagZ int
+	var maxMagX float64
+	var maxMagY float64
+	var maxMagZ float64
 
-	var minMagX int
-	var minMagY int
-	var minMagZ int
+	var minMagX float64
+	var minMagY float64
+	var minMagZ float64
 
 	var deltaAccelX float64
 	var deltaAccelY float64

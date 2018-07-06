@@ -12,4 +12,4 @@ mysql:
   user: "root"
   password: "password"
   database: "d2d"
-  port: 3306
+  port: 13306

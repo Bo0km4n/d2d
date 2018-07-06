@@ -2,7 +2,7 @@ package log
 
 type LogParam struct {
 	Time   uint64  `json:"time"`
-	UUID   string  `json:"macAddress"`
+	UUID   string  `json:"macAdress"`
 	Sensor *Sensor `json:"sensor"`
 }
 
@@ -13,19 +13,19 @@ type Sensor struct {
 }
 
 type Accel struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-	Z int `json:"z"`
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+	Z float64 `json:"z"`
 }
 
 type Gyro struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-	Z int `json:"z"`
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+	Z float64 `json:"z"`
 }
 
 type Mag struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-	Z int `json:"z"`
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+	Z float64 `json:"z"`
 }
