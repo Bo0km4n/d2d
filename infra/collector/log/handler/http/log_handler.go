@@ -46,7 +46,7 @@ func NewHTTPLogHandler(g *gin.Engine, uc logUC.LogUC) {
 		logUC: uc,
 	}
 	v1 := g.Group("/api/v1")
-	v1.GET("/log", h.Store)
+	v1.POST("/log", h.Store)
 }
 
 func convertParamToLogs(param []*logEntity.LogParam) []*model.Log {

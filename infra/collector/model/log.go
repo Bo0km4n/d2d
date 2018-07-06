@@ -3,8 +3,8 @@ package model
 import "time"
 
 type Log struct {
-	ID        int `gorm:"primary_key"`
-	UUID      string
+	ID        int    `gorm:"primary_key"`
+	UUID      string `json:"macAddress"`
 	Time      uint64
 	AccelX    int
 	AccelY    int
