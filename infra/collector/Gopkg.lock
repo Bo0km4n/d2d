@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/Bo0km4n/d2d"
-  packages = ["infra/nats"]
-  revision = "4b9bed8fdf92716cced9c1b79f6828491b76503e"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
@@ -92,18 +86,6 @@
   revision = "bb74f1db0675b241733089d5a1faa5dd8b0ef57b"
 
 [[projects]]
-  name = "github.com/nats-io/go-nats"
-  packages = [".","encoders/builtin","util"]
-  revision = "062418ea1c2181f52dc0f954f6204370519a868b"
-  version = "v1.5.0"
-
-[[projects]]
-  name = "github.com/nats-io/nuid"
-  packages = ["."]
-  revision = "289cccf02c178dc782430d534e3c1f5b72af807f"
-  version = "v1.0.0"
-
-[[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
   revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
@@ -178,6 +160,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "643ae68375d4bbb112401e735ca822ce50473ac859286aac45f42e70816b236a"
+  inputs-digest = "8a80e81a807a6f6e4b51792d1cf47b5580b68e87bd35c8ea49596651b8c63ece"
   solver-name = "gps-cdcl"
   solver-version = 1

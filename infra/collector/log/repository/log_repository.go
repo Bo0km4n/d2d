@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Bo0km4n/d2d/infra/collector/model"
-	"github.com/Bo0km4n/d2d/infra/nats"
 	"github.com/jinzhu/gorm"
 )
 
@@ -15,15 +14,13 @@ type LogRepository interface {
 }
 
 type logRepository struct {
-	NATSConn *nats.NATS
-	DB       *gorm.DB
+	DB *gorm.DB
 }
 
 // NewLogRepository //
-func NewLogRepository(conn *nats.NATS, db *gorm.DB) LogRepository {
+func NewLogRepository(db *gorm.DB) LogRepository {
 	logRepo := logRepository{
-		NATSConn: conn,
-		DB:       db,
+		DB: db,
 	}
 	return &logRepo
 }

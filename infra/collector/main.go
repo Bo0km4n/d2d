@@ -9,13 +9,12 @@ import (
 	logRepo "github.com/Bo0km4n/d2d/infra/collector/log/repository"
 	logUC "github.com/Bo0km4n/d2d/infra/collector/log/usecase"
 	"github.com/Bo0km4n/d2d/infra/collector/middleware"
-	"github.com/Bo0km4n/d2d/infra/nats"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
 func init() {
-	nats.New("localhost", "4222", "d2d")
+	// nats.New("localhost", "4222", "d2d")
 	viper.AddConfigPath("./config")
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("local")
@@ -46,7 +45,7 @@ func NewRouter() *gin.Engine {
 	api.Use(middleware.Cors())
 
 	{
-		logRepo := logRepo.NewLogRepository(nats.NATSConn, db.DB)
+		logRepo := logRepo.NewLogRepository(db.DB)
 		aggRepo := aggRepo.NewAggregatedLogRepository(db.DB)
 		logUC := logUC.NewLogUsecase(logRepo, aggRepo)
 		logHandler.NewHTTPLogHandler(api, logUC)
