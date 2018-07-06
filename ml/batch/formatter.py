@@ -2,7 +2,7 @@ import os, sys
 sys.path.append(os.getcwd())
 
 # return x_train, y_train
-def format_aggregated_data(data):
+def format_data(data):
     x_train = []
     y_train = []
 
