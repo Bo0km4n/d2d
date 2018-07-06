@@ -2,32 +2,41 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/Bo0km4n/d2d/infra/collector/model"
 	"github.com/Bo0km4n/d2d/infra/nats"
+	"github.com/jinzhu/gorm"
 )
 
 // LogRepository interface
 type LogRepository interface {
-	StoreToNATS(ctx context.Context, item interface{}) error
+	StoreDB(ctx context.Context, item []*model.Log) error
+	Store(ctx context.Context, item *model.AggregatedLog) error
 }
 
 type logRepository struct {
 	NATSConn *nats.NATS
+	DB       *gorm.DB
 }
 
 // NewLogRepository //
-func NewLogRepository(conn *nats.NATS) LogRepository {
+func NewLogRepository(conn *nats.NATS, db *gorm.DB) LogRepository {
 	logRepo := logRepository{
 		NATSConn: conn,
+		DB:       db,
 	}
 	return &logRepo
 }
 
-func (lr *logRepository) StoreToNATS(ctx context.Context, item interface{}) error {
-	body, err := json.Marshal(&item)
-	if err != nil {
-		return err
+func (lr *logRepository) StoreDB(ctx context.Context, item []*model.Log) error {
+	for i := range item {
+		if err := lr.DB.Create(item[i]).Error; err != nil {
+			return err
+		}
 	}
-	return lr.NATSConn.Publish(body)
+	return nil
+}
+
+func (lr *logRepository) Store(ctx context.Context, item *model.AggregatedLog) error {
+	return lr.DB.Create(item).Error
 }
