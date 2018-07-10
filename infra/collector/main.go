@@ -1,16 +1,30 @@
 package main
 
 import (
+	"log"
+
+	aggRepo "github.com/Bo0km4n/d2d/infra/collector/aggregatedlog/repository"
+	"github.com/Bo0km4n/d2d/infra/collector/db"
 	logHandler "github.com/Bo0km4n/d2d/infra/collector/log/handler/http"
 	logRepo "github.com/Bo0km4n/d2d/infra/collector/log/repository"
 	logUC "github.com/Bo0km4n/d2d/infra/collector/log/usecase"
 	"github.com/Bo0km4n/d2d/infra/collector/middleware"
-	"github.com/Bo0km4n/d2d/infra/nats"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func init() {
-	nats.New("localhost", "4222", "d2d")
+	// nats.New("localhost", "4222", "d2d")
+	viper.AddConfigPath("./config")
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("local")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Println("config err", err)
+	}
+
+	db.MySQL()
+	db.Migrate()
 }
 
 func main() {
@@ -31,8 +45,9 @@ func NewRouter() *gin.Engine {
 	api.Use(middleware.Cors())
 
 	{
-		logRepo := logRepo.NewLogRepository(nats.NATSConn)
-		logUC := logUC.NewLogUsecase(logRepo)
+		logRepo := logRepo.NewLogRepository(db.DB)
+		aggRepo := aggRepo.NewAggregatedLogRepository(db.DB)
+		logUC := logUC.NewLogUsecase(logRepo, aggRepo)
 		logHandler.NewHTTPLogHandler(api, logUC)
 	}
 
