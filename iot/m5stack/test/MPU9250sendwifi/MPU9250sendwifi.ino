@@ -22,7 +22,7 @@
 
 #define processing_out false
 #define AHRS true         // Set to false for basic data read
-#define SerialDebug true  // Set to true to get Serial output for debugging
+#define SerialDebug false  // Set to true to get Serial output for debugging
 #define LCD
 
 #define WIFI_SSID "yanaka"
@@ -35,14 +35,17 @@ HTTPClient http;
 WiFiMulti wifi;
 
 
-StaticJsonBuffer<5000> jsonBuffer;
+StaticJsonBuffer<30000> jsonBuffer;      
+char sendDataBuffer[30000];
+
 JsonArray& root= jsonBuffer.createArray();
 
 bool operatingState = false;//検知の動作状態
 bool sendState = false;//送信状態
 bool detectState = false;//検知しているかの状態
 float lastMz =0;
-float variation = 50;//変化量
+float lastAx = 0;
+float variation = 100;//変化量
 int startTime =0;
 char mac_addres[20];
 
@@ -54,7 +57,7 @@ void setup()
  pinMode(buttonA_GPIO, INPUT); //GPIO #39 は内部プルアップ無し
  byte mac_addr_buf[6];
 
-  WiFi.macAddress(mac_addr_buf);
+  esp_efuse_mac_get_default(mac_addr_buf);
   sprintf(mac_addres, "%02X:%02X:%02X:%02X:%02X:%02X", mac_addr_buf[0], mac_addr_buf[1], mac_addr_buf[2], mac_addr_buf[3], mac_addr_buf[4], mac_addr_buf[5]);
 
 #ifdef LCD
@@ -432,7 +435,7 @@ void loop()
 
       // M5.Lcd.setCursor(0, 60);
       // M5.Lcd.printf("yaw:%6.2f   pitch:%6.2f   roll:%6.2f  ypr \r\n",(IMU.yaw), (IMU.pitch), (IMU.roll));
-      M5.Lcd.setCursor(12, 144); 
+      M5.Lcd.setCursor(12, 124); 
       M5.Lcd.print("rt: ");
       M5.Lcd.print((float) IMU.sumCount / IMU.sum, 2);
       M5.Lcd.println(" Hz");
@@ -444,16 +447,19 @@ void loop()
        detectState = false;
   }
         if(operatingState == true){
-              M5.Lcd.println("System ON ");
+                M5.Lcd.setCursor(0,  144);
+              M5.Lcd.printf("System ON ");
 
       }else  if(operatingState == false){
-              M5.Lcd.println("System OFF ");
+              M5.Lcd.setCursor(0,  144);
+              M5.Lcd.printf("System OFF ");
       }
-   
+            float ax = 1000*IMU.ax;
+
   if(operatingState == true && detectState == false){
     Serial.println(lastMz+variation);
-    
-    if(lastMz+variation <IMU.mz ||IMU.mz <lastMz-variation)
+
+    if(lastMz+variation <IMU.mz ||IMU.mz <lastMz-variation || lastAx+variation <ax ||ax <lastAx-variation)
         {
           detectState = true;
           sendState =false;
@@ -462,7 +468,7 @@ void loop()
 
    }
    if(operatingState == true && detectState == true){
-        if(lastMz+variation >IMU.mz && IMU.mz >lastMz-variation){
+        if(lastMz+variation >IMU.mz && IMU.mz >lastMz-variation &&lastAx+variation >ax && ax >lastAx-variation){
           detectState = false;
           sendState =true;
 
@@ -477,7 +483,7 @@ void loop()
   JsonObject&  accel= sensor.createNestedObject("accel");
   JsonObject& gyro= sensor.createNestedObject("gyro");
   JsonObject& mag= sensor.createNestedObject("mag");
-
+  loopData["macAdress"]=mac_addres;
   loopData["time"] = millis()-startTime;
   accel["x"]= 1000*IMU.ax;
   accel["y"]= 1000*IMU.ay;
@@ -498,19 +504,18 @@ void loop()
                 Serial.println("send");
                 sendState =false;
         
-      char sensorData[5000];
     
-      root.printTo(sensorData,sizeof(sensorData));//josnからstringへの変換
+      root.printTo(sendDataBuffer,sizeof(sendDataBuffer));//josnからstringへの変換
       Serial.println("debug");
-      Serial.println(sensorData);
+      Serial.println(sendDataBuffer);
       
     
           // wifi
       wifi.addAP(WIFI_SSID, WIFI_PASS);
-       
+       /*
       while (wifi.run() != WL_CONNECTED) {
         delay(100);
-        //M5.Lcd.printf(".");
+        M5.Lcd.printf(".");
       }
       M5.Lcd.println("wifi connect ok");
      
@@ -520,19 +525,47 @@ void loop()
       
       int a = http.POST((uint8_t*)sensorData, strlen(sensorData));
       M5.Lcd.println("post");
-        M5.Lcd.println(a);
+        M5.Lcd.println(a);*/
+        //200がでるまで繰り返し
+        int a =0;
+        M5.Lcd.setCursor(0,  164);
+        while(a !=200){
+           while (wifi.run() != WL_CONNECTED) {
+           delay(100);
+          M5.Lcd.printf(".");
+          }
+        M5.Lcd.fillRect(0, 164, 320,240, BLACK);
+        M5.Lcd.setCursor(0,  164);
+        M5.Lcd.println("wifi connect ok"); 
+
+
+   
+        // post 
+        http.begin( "http://192.168.43.195:8765/api/v1/log" );
+        http.addHeader("Content-Type", "application/json" );
+        a = http.POST((uint8_t*)sendDataBuffer, strlen(sendDataBuffer));
+        M5.Lcd.setCursor(0,  184);
+        M5.Lcd.print("post");
+        M5.Lcd.print(a);
+          }
+        
         jsonBuffer.clear();
                
         JsonArray& root= jsonBuffer.createArray();
+        delay(1000);
+        M5.Lcd.fillRect(0, 164, 320,240, BLACK);
+        //M5.Lcd.setCursor(0,  164);
+        //M5.Lcd.print("                                                  "); 
+        //M5.Lcd.setCursor(0,  184);
+        //M5.Lcd.print("                                                  "); 
 
     }
    
 
   
 
-  delay(10);
-   lastMz = IMU.mz;
-      
+      lastMz = IMU.mz;
+      lastAx = 1000*IMU.ax;
 
       
       IMU.count = millis();

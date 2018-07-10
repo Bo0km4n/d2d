@@ -14,9 +14,8 @@ console.log('Server is online.');
 
 app.post('/', function(req, res) {
     // リクエストボディを出力
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
     // パラメータ名、nameを出力
-    console.log(req.body.name);
 
     res.send('POST request to the homepage');
 })
