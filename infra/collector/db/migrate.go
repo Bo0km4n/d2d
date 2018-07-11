@@ -8,5 +8,6 @@ func Migrate() {
 	DB.AutoMigrate(
 		&model.Log{},
 		&model.AggregatedLog{},
+		&model.Label{},
 	)
 }

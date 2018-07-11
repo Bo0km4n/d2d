@@ -19,15 +19,13 @@ nb_epoch = 20
 # floatに型変換
 X_train = X_train.astype('float32')
 
-print(X_train[0])
-print(X_train.shape)
-
 X_test = X_test.astype('float32')
 # 各画素値を正規化
 X_train /= 255.0
 X_test /= 255.
 
 Y_train = np_utils.to_categorical(y_train, nb_classes)
+print(Y_train)
 Y_test = np_utils.to_categorical(y_test, nb_classes)
 
 # モデルの定義

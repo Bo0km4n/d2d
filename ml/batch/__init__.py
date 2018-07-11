@@ -1,2 +1,2 @@
-from . import cnn
+from . import svm
 from . import formatter

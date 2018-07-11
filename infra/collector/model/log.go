@@ -21,7 +21,7 @@ type Log struct {
 
 type AggregatedLog struct {
 	ID          int `gorm:"primary_key"`
-	Label       string
+	Label       int
 	UUID        string
 	ElapsedTime uint64
 	DeltaAccelX float64

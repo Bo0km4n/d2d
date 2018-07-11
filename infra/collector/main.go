@@ -9,6 +9,7 @@ import (
 	logRepo "github.com/Bo0km4n/d2d/infra/collector/log/repository"
 	logUC "github.com/Bo0km4n/d2d/infra/collector/log/usecase"
 	"github.com/Bo0km4n/d2d/infra/collector/middleware"
+	"github.com/Bo0km4n/d2d/infra/collector/model"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -25,6 +26,7 @@ func init() {
 
 	db.MySQL()
 	db.Migrate()
+	model.InitLabel(db.DB)
 }
 
 func main() {
