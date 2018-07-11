@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.externals import joblib
 
 class SVM:
-    def __init__(self, x_train, y_train):
+    def __init__(self, x_train=None, y_train=None):
         self.x_train = x_train
         self.y_train = y_train
         self.model = SVC(kernel='linear', random_state=None)
