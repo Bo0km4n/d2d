@@ -3,9 +3,8 @@ package model
 import "github.com/jinzhu/gorm"
 
 var labels = map[string]int{
-	"joy":    1,
-	"anger":  2,
-	"sorrow": 3,
+	"negative": 1,
+	"positive": 2,
 }
 
 // 嬉しい
