@@ -11,7 +11,7 @@ import (
 
 // LogUC //
 type LogUC interface {
-	Store(ctx context.Context, item []*model.Log) error
+	Store(ctx context.Context, item []*model.Log) (*model.AggregatedLog, error)
 }
 
 type logUC struct {
@@ -27,7 +27,7 @@ func NewLogUsecase(repo logRepo.LogRepository, aggrepo aggregatedLogRepo.Aggrega
 	}
 }
 
-func (luc *logUC) Store(ctx context.Context, item []*model.Log) error {
+func (luc *logUC) Store(ctx context.Context, item []*model.Log) (*model.AggregatedLog, error) {
 	return luc.aggregatedLogRepo.Store(ctx, compressLog(item))
 	// return luc.logRepo.StoreDB(ctx, item)
 }

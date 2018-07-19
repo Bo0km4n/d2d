@@ -12,3 +12,8 @@ class AggregatedLog:
         cur = self.conn.cursor(dictionary=True)
         cur.execute(sql_statement)
         return cur.fetchall()
+
+    def fetch_label(self, uid):
+        cur = self.conn.cursor(dictionary=True)
+        cur.execute("SELECT * FROM label WHERE uid = "+str(uid))
+        return cur.fetchall()[0]['label']

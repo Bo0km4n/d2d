@@ -10,7 +10,7 @@ import (
 // LogRepository interface
 type LogRepository interface {
 	StoreDB(ctx context.Context, item []*model.Log) error
-	Store(ctx context.Context, item *model.AggregatedLog) error
+	Store(ctx context.Context, item *model.AggregatedLog) (*model.AggregatedLog, error)
 }
 
 type logRepository struct {
@@ -34,6 +34,7 @@ func (lr *logRepository) StoreDB(ctx context.Context, item []*model.Log) error {
 	return nil
 }
 
-func (lr *logRepository) Store(ctx context.Context, item *model.AggregatedLog) error {
-	return lr.DB.Create(item).Error
+func (lr *logRepository) Store(ctx context.Context, item *model.AggregatedLog) (*model.AggregatedLog, error) {
+	err := lr.DB.Create(item).Error
+	return item, err
 }

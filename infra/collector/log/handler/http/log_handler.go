@@ -7,8 +7,8 @@ import (
 
 	logEntity "github.com/Bo0km4n/d2d/infra/collector/log"
 	logUC "github.com/Bo0km4n/d2d/infra/collector/log/usecase"
+	mlRepo "github.com/Bo0km4n/d2d/infra/collector/ml/repository"
 	"github.com/Bo0km4n/d2d/infra/collector/model"
-	"github.com/k0kubun/pp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,15 +29,19 @@ func (h *HTTPLogHandler) Store(c *gin.Context) {
 	}
 
 	ctx := context.Background()
-	pp.Println(param)
 	item := convertParamToLogs(param)
 
-	if err := h.logUC.Store(ctx, item); err != nil {
+	logs, err := h.logUC.Store(ctx, item)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, item)
+	preRepo := mlRepo.NewMlRepository()
+	preResult, err := preRepo.Predict(logs)
+
+	log.Printf("Emotion: %+v", preResult)
+	c.JSON(http.StatusOK, preResult)
 }
 
 // NewHTTPLogHandler //

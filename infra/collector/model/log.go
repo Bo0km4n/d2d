@@ -20,17 +20,17 @@ type Log struct {
 }
 
 type AggregatedLog struct {
-	ID          int `gorm:"primary_key"`
-	Label       int
-	UUID        string
-	ElapsedTime uint64
-	DeltaAccelX float64
-	DeltaAccelY float64
-	DeltaAccelZ float64
-	DeltaGyroX  float64
-	DeltaGyroY  float64
-	DeltaGyroZ  float64
-	DeltaMagX   float64
-	DeltaMagY   float64
-	DeltaMagZ   float64
+	ID          int     `gorm:"primary_key" json:"id"`
+	Label       int     `json:"label"`
+	UUID        string  `json:"uuid"`
+	ElapsedTime uint64  `json:"elapsed_time"`
+	DeltaAccelX float64 `json:"delta_accel_x"`
+	DeltaAccelY float64 `json:"delta_accel_y"`
+	DeltaAccelZ float64 `json:"delta_accel_z"`
+	DeltaGyroX  float64 `json:"delta_gyro_x"`
+	DeltaGyroY  float64 `json:"delta_gyro_y"`
+	DeltaGyroZ  float64 `json:"delta_gyro_z"`
+	DeltaMagX   float64 `json:"delta_mag_x"`
+	DeltaMagY   float64 `json:"delta_mag_y"`
+	DeltaMagZ   float64 `json:"delta_mag_z"`
 }

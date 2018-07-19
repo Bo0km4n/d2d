@@ -3,6 +3,7 @@ sys.path.append(os.getcwd())
 
 import batch.svm
 import batch.formatter
+import aggregatedlog
 import json
 import numpy as np
 from functools import wraps
@@ -44,7 +45,9 @@ def predict():
     b_array = np.array([b_array])
     result = clf.pred(b_array)
 
-    resp_body = {"predict": int(result[0])}
+    logger = aggregatedlog.aggregatedlog.AggregatedLog()
+    label = logger.fetch_label(int(result[0]))
+    resp_body = {"predict": label}
     print(resp_body)
     response = jsonify(resp_body)
     response.status_code = 201

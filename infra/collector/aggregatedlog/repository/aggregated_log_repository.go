@@ -8,7 +8,7 @@ import (
 )
 
 type AggregatedLogRepository interface {
-	Store(ctx context.Context, item *model.AggregatedLog) error
+	Store(ctx context.Context, item *model.AggregatedLog) (*model.AggregatedLog, error)
 }
 
 type aggregatedLogRepository struct {
@@ -23,6 +23,7 @@ func NewAggregatedLogRepository(db *gorm.DB) AggregatedLogRepository {
 	return &repo
 }
 
-func (alr *aggregatedLogRepository) Store(ctx context.Context, item *model.AggregatedLog) error {
-	return alr.DB.Create(item).Error
+func (alr *aggregatedLogRepository) Store(ctx context.Context, item *model.AggregatedLog) (*model.AggregatedLog, error) {
+	err := alr.DB.Create(item).Error
+	return item, err
 }
