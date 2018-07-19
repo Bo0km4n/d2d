@@ -12,7 +12,9 @@
  Madgwick and Mahony filter algorithms. Sketch runs on the 3.3 V 8 MHz Pro Mini
  and the Teensy 3.1.
  */
- 
+
+#include "dataQueue.h"
+
 #include <ArduinoJson.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
@@ -49,8 +51,15 @@ float variation = 100;//変化量
 int startTime =0;
 char mac_addres[20];
 
+dataQueue MzQueue ; 
+dataQueue AxQueue;
+
+
 void setup()
 {
+
+
+  
   M5.begin();
   Wire.begin();
 
@@ -330,7 +339,7 @@ void loop()
 
     // update LCD once per half-second independent of read rate
     // if (IMU.delt_t > 500)
-    if (IMU.delt_t > 100)
+    if (IMU.delt_t > 50) //センサの計測間隔
     {
       if(SerialDebug)
       {
@@ -459,7 +468,7 @@ void loop()
   if(operatingState == true && detectState == false){
     Serial.println(lastMz+variation);
 
-    if(lastMz+variation <IMU.mz ||IMU.mz <lastMz-variation || lastAx+variation <ax ||ax <lastAx-variation)
+    if( AxQueue.checkAwake()||MzQueue.checkAwake())
         {
           detectState = true;
           sendState =false;
@@ -468,7 +477,7 @@ void loop()
 
    }
    if(operatingState == true && detectState == true){
-        if(lastMz+variation >IMU.mz && IMU.mz >lastMz-variation &&lastAx+variation >ax && ax >lastAx-variation){
+        if(AxQueue.checkStable() &&MzQueue.checkStable()){
           detectState = false;
           sendState =true;
 
@@ -476,7 +485,8 @@ void loop()
     }   
    if(operatingState == true &&detectState ==true){//データの蓄積部
                 Serial.println("store");
-
+          M5.Lcd.setCursor(0,  164);
+        M5.Lcd.println("store"); 
 
     JsonObject& loopData = jsonBuffer.createObject();
   JsonObject& sensor = loopData.createNestedObject("sensor");
@@ -501,7 +511,9 @@ void loop()
   
    }
     if(operatingState == true &&sendState ==true){
-                Serial.println("send");
+        Serial.println("send");
+        M5.Lcd.setCursor(0,  164);
+        M5.Lcd.println("send"); 
                 sendState =false;
         
     
@@ -528,23 +540,23 @@ void loop()
         M5.Lcd.println(a);*/
         //200がでるまで繰り返し
         int a =0;
-        M5.Lcd.setCursor(0,  164);
+        M5.Lcd.setCursor(0,  184);
         while(a !=200){
            while (wifi.run() != WL_CONNECTED) {
            delay(100);
           M5.Lcd.printf(".");
           }
-        M5.Lcd.fillRect(0, 164, 320,240, BLACK);
-        M5.Lcd.setCursor(0,  164);
+        M5.Lcd.fillRect(0, 184, 320,240, BLACK);
+        M5.Lcd.setCursor(0,  184);
         M5.Lcd.println("wifi connect ok"); 
 
 
    
         // post 
-        http.begin( "http://192.168.43.195:8765/api/v1/log" );
+        http.begin( "http://192.168.43.172:3000/" );
         http.addHeader("Content-Type", "application/json" );
         a = http.POST((uint8_t*)sendDataBuffer, strlen(sendDataBuffer));
-        M5.Lcd.setCursor(0,  184);
+        M5.Lcd.setCursor(0,  204);
         M5.Lcd.print("post");
         M5.Lcd.print(a);
           }
@@ -563,7 +575,8 @@ void loop()
    
 
   
-
+      MzQueue.enque(lastMz -IMU.mz);
+      AxQueue.enque(lastAx -1000*IMU.ax);
       lastMz = IMU.mz;
       lastAx = 1000*IMU.ax;
 
@@ -588,3 +601,6 @@ void loop()
   
    
 }
+
+
+
