@@ -1,0 +1,75 @@
+replicaCount: 1
+
+image:
+  repository: gcr.io/emerald-agility2201092/collector
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 8888
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: cloud.google.com/gke-preemptible
+            operator: DoesNotExist
+
+node:
+  clusterName: "d2d-dev"
+  zone: "asia-northeast1-a"
+  kubeConfig: "/root/.kube"
+
+configmap:
+  SERVER_ENV: "dev"
+  SERVER_API_PORT: "8888"
+  SERVER_AWS_SES_REGION: "us-east-1"
+  SERVER_AWS_SES_EMAIL: "admin@reck.io"
+  SERVER_FRONT_BASEURL: "https://console.cdp-dev-reckoner.com"
+  SERVER_GCP_PROJECTID: "cdp-dev-206602"
+  SERVER_GCP_STORAGE_META_GOOGLE_ACCESS_ID: "606093242341-compute@developer.gserviceaccount.com"
+  SERVER_GCP_STORAGE_META_PEM_FILE_PATH: "/var/secrets/google/pem/key.pem"
+  SERVER_GCP_STORAGE_LOAD_BUCKET: "cdp-dev-load-bucket"
+  SERVER_GCP_STORAGE_QUERY_RESULT_BUCKET: "cdp-dev-query-result"
+  SERVER_GCP_STORAGE_TRACKING_WEB_RAW_DATA_BUCKET: "cdp-dev-tracking-web-raw-data"
+  SERVER_GCP_PUBSUB_RUN_QUERY_MESSAGE_TOPICID: "cdp-dev-topic-run-query-message"
+  SERVER_GCP_PUBSUB_OUTPUT_MESSAGE_TOPICID: "cdp-dev-topic-output-message"
+  SERVER_JWT_KEY: "dddddddddddddddd"
+  SERVER_HIVE_BASEURL: "http://cdp-dev-presto-m.c.cdp-dev-206602.internal"
+  SERVER_HIVE_PORT: "50111"
+  SERVER_HIVE_USER: "hive"
+  SERVER_METASTORE_DIALECT: "mysql"
+  SERVER_METASTORE_INSTANCE_NAME: "cloud-sql-proxy-metastore"
+  SERVER_METASTORE_PORT: "3306"
+  SERVER_METASTORE_USER: "hive"
+  SERVER_METASTORE_PASSWORD: "qF6czZ2nRsHqG"
+  SERVER_METASTORE_DATABASE: "metastore"
+  SERVER_PSQL_DIALECT: "postgres"
+  SERVER_PSQL_HOST: "cloud-sql-proxy-cdp"
+  SERVER_PSQL_USER: "reckoner"
+  SERVER_PSQL_PASSWORD: "qF6czZ2nRsHqG"
+  SERVER_PSQL_DATABASE: "cdp"
+  SERVER_PSQL_PORT: "5432"
+  SERVER_PSQL_LOG_MODE: "true"
+  SERVER_REDIS_HOST: "redis-master"
+  SERVER_REDIS_PORT: "6379"
+  SERVER_REDIS_MAXCONN: "1000"
+  SERVER_PRESTO_HOST: "cdp-dev-presto-m.c.cdp-dev-206602.internal"
+  SERVER_PRESTO_PORT: "8080"
+  GOOGLE_APPLICATION_CREDENTIALS: "/var/secrets/google/key/key.json"
+
+ingress:
+  enabled: true
+  annotations:
+    ingress.gcp.kubernetes.io/pre-shared-cert: d2d-dev
+  path: /*
+  hosts:
+    - frontend.d2d-dev-reckoner.com
